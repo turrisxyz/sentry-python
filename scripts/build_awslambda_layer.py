@@ -1,16 +1,15 @@
+import json
 import os
+import shutil
 import subprocess
 import tempfile
-import shutil
 
-from sentry_sdk.consts import VERSION as SDK_VERSION
+import requests
 from sentry_sdk._types import MYPY
+from sentry_sdk.consts import VERSION as SDK_VERSION
 
 if MYPY:
     from typing import Union
-
-
-EXTENSION_NAME = "sentry-extension"
 
 
 class PackageBuilder:
@@ -63,36 +62,32 @@ class PackageBuilder:
             "scripts/init_serverless_sdk.py", f"{serverless_sdk_path}/__init__.py"
         )
 
+    def download_app(self, app, version, target_dir):
+        registry_url = f"https://release-registry.services.sentry.io/apps/{app}/latest"
+
+        app_details = json.loads(requests.get(registry_url).text)
+        url = app_details["files"][version]["url"]
+        app_binary = requests.get(url)
+
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+        open(os.path.join(target_dir, app), "wb").write(app_binary.content)
+
     def add_sentry_extension(self):
         # type: (...) -> None
         """
         Adds the Sentry Lambda extension to the layer
         """
-        shutil.copy("aws-lambda-extension/relay/relay", f"{self.base_dir}/")
+
+        # Download latest relay from registry
+        self.download_app("relay", "relay-Linux-x86_64", target_dir=f"{self.base_dir}/")
         shutil.copytree(
             "aws-lambda-extension/relay/.relay/", f"{self.base_dir}/.relay/"
         )
 
+        # Copy rust extension
         shutil.copytree(
             "aws-lambda-extension/extensions/", f"{self.base_dir}/extensions/"
-        )
-
-        extension_dir = f"{self.base_dir}/{EXTENSION_NAME}/"
-        shutil.copytree(f"aws-lambda-extension/{EXTENSION_NAME}", f"{extension_dir}")
-
-        # Add requiremenents of extension
-        subprocess.run(
-            [
-                "pip",
-                "install",
-                "--no-cache-dir",  # Disables the cache -> always accesses PyPI
-                "-q",  # Quiet
-                "-r",
-                "aws-lambda-extension/requirements.txt",
-                "-t",  # Target directory flag
-                extension_dir,
-            ],
-            check=True,
         )
 
     def zip(
