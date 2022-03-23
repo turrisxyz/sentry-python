@@ -80,6 +80,7 @@ class PackageBuilder:
         """
 
         # Download latest relay from registry
+        # TODO: change verion ("relay-Linux-x86_64") to something that can run in Lambda Execution environment.
         self.download_app("relay", "relay-Linux-x86_64", target_dir=f"{self.base_dir}/")
         shutil.copytree(
             "aws-lambda-extension/relay/.relay/", f"{self.base_dir}/.relay/"
