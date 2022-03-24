@@ -21,8 +21,7 @@ jobs:
           python-version: 3.9
 
       - run: |
-          pip install virtualenv
-          make dist
+          mkdir dist
           mkdir dist/sentry-lambda-layer
           mkdir dist/sentry-lambda-layer/python
           echo "something" > dist/sentry-lambda-layer/python/bla.txt
@@ -42,6 +41,7 @@ jobs:
   extension:
     name: Build extions package
     runs-on: ubuntu-latest
+    needs: dist
 
     steps:
       - uses: actions/download-artifact@v2
