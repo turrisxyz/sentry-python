@@ -49,3 +49,11 @@ jobs:
           name: ${{ github.sha }}
       - run: |
           ls -alh
+          mkdir sentry-lambda-layer/extensions
+          echo "pwd $$ ls -alh" > sentry-lambda-layer/extensions/my-extension.sh
+          chmod +x sentry-lambda-layer/extensions/my-extension.sh
+      - run: |
+          zip sentry-lambda-lazyer.zip sentry-lambda-layer/
+          ls -alh
+          echo "im zip"
+          unzip -Z1 file.zip
