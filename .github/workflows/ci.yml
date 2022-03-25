@@ -38,11 +38,13 @@ jobs:
           artifact_name: prepared-lambda-layer-${{ github.sha }}
           zip_file_name: aws-lambda-layer.zip
 
-      - name: Download zip
-        uses: actions/download-artifact@v3
-        with:
-          name: prepared-lambda-layer-${{ github.sha }}
-          path: aws-lambda-layer.zip
+      #      - name: Download zip
+      #        uses: actions/download-artifact@v3
+      #        with:
+      #          name: prepared-lambda-layer-${{ github.sha }}
+      #          path: aws-lambda-layer.zip
+      - run: |
+          ls -alh
 
       - name: Upload Zip
         uses: actions/upload-artifact@v3
