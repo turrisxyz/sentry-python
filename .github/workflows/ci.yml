@@ -27,12 +27,7 @@ jobs:
           echo "something" > dist/sentry-lambda-layer/python/bla.txt
           echo "not enought stuff?" > dist/sentry-lambda-layer/main.txt
 
-      # make dist
-      # make lambda-layer-dir (new)
-      # make add-extension-binaries (new)
-      # make lambda-distribution-zip (new)
-
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: prepared-lambda-layer-${{ github.sha }}
           path: |
@@ -41,3 +36,16 @@ jobs:
       - uses: getsentry/action-build-aws-lambda-extension@v1
         with:
           artifact_name: prepared-lambda-layer-${{ github.sha }}
+          zip_file_name: aws-lambda-layer.zip
+
+      - name: Download zip
+        uses: actions/download-artifact@v3
+        with:
+          name: prepared-lambda-layer-${{ github.sha }}
+          path: aws-lambda-layer.zip
+
+      - name: Upload Zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}
+          path: aws-lambda-layer.zip
