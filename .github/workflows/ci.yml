@@ -38,6 +38,6 @@ jobs:
           path: |
             dist/*
 
-      - uses: getsentry/action-build-aws-lambda-extension
+      - uses: getsentry/action-build-aws-lambda-extension@v1
         with:
           name: ${{ github.sha }}
