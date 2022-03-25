@@ -38,24 +38,6 @@ jobs:
           path: |
             dist/*
 
-  extension:
-    name: Build extions package
-    runs-on: ubuntu-latest
-    needs: dist
-
-    steps:
-      - uses: actions/download-artifact@v2
+      - uses: getsentry/action-build-aws-lambda-extension
         with:
           name: ${{ github.sha }}
-      - run: |
-          ls -alh
-          mkdir sentry-lambda-layer/extensions
-          echo "pwd $$ ls -alh" > sentry-lambda-layer/extensions/my-extension.sh
-          chmod +x sentry-lambda-layer/extensions/my-extension.sh
-          curl -0 --silent --output sentry-lambda-layer/relay `curl -s https://release-registry.services.sentry.io/apps/relay/latest | jq -r .files.\"relay-Linux-x86_64\".url`
-
-      - run: |
-          zip -r sentry-lambda-layer.zip sentry-lambda-layer/
-          ls -alh
-          echo "im zip"
-          unzip -Z1 sentry-lambda-layer.zip
